@@ -1,14 +1,20 @@
-import os
+import argparse
+import os, time
 import pandas as pd
 from datetime import datetime
-
-# reading the meeting details
-df = pd.read_csv('meetingschedule.csv')
-df_new = pd.DataFrame()
 
 # https://superuser.com/a/1563359
 # https://superuser.com/a/1624394
 join_url = '--url="zoommtg://zoom.us/join?confno={meeting_id}&pwd={hashed_pass}"'
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Zoom start automation')
+
+    parser.add_argument('-c', '--cron', action='store_true', help='Script is running with crontab. Also can be used for running script once')
+    parser.add_argument('-s', '--schedule', type=str, help='File with schedule', default='meetingschedule.csv')
+
+    return parser.parse_args()
 
 def open_zoom(meeting_id, hashed_pass):
     join_param = join_url.format(
@@ -24,7 +30,15 @@ def open_zoom(meeting_id, hashed_pass):
         # linux, unix, etc (I hope)
         os.system(f'zoom {join_param}')
 
-def main():
+def check_zoom_running():
+    import psutil
+    return 'zoom' in (p.name() for p in psutil.process_iter())
+
+def main(schedule_file):
+    # reading the meeting details
+    df = pd.read_csv(schedule_file)
+    df_new = pd.DataFrame()
+
     # Check the current system time
     timestr = datetime.now().strftime('%H:%M')
 
@@ -40,10 +54,18 @@ def main():
     open_zoom(meeting_id, hashed_pass)
 
 if __name__ == '__main__':
-    import time
+    is_zoom_running = check_zoom_running()
+    if is_zoom_running:
+        quit('Another instance of zoom is running. Quitting')
+
+    args = parse_args()
+
+    if args.cron:
+        main(args.schedule)
+        quit()
 
     while(True):
-        main()
+        main(args.schedule)
 
         # Wait for one minute before the next iteration starts
         time.sleep(60)
