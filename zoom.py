@@ -16,19 +16,37 @@ def parse_args():
 
     return parser.parse_args()
 
+def zoom_exec():
+    import sys
+    if sys.platform.startswith('win32'):
+        # %HOME%/Appdata/Roaming
+        appdata = os.getenv('APPDATA')
+        zoom_exe = f'{appdata}/Zoom/bin/Zoom.exe'
+
+        if not os.path.exists(zoom_exe):
+            zoom_exe = ''
+    else:
+        # linux, unix, etc (I hope)
+        zoom_exe = 'zoom'
+
+        if os.system('which zoom') == 256:
+            zoom_exe = ''
+
+    if zoom_exe:
+        return zoom_exe
+
+    quit('zoom not installed or not found')
+
 def open_zoom(meeting_id, hashed_pass):
     join_param = join_url.format(
         meeting_id=meeting_id.replace(' ', ''),
         hashed_pass=hashed_pass,
     )
 
-    import sys
-    if sys.platform.startswith('win32'):
-        appdata = os.getenv('APPDATA')
-        os.system(f'{appdata}/Zoom/bin/Zoom.exe {join_param}')
-    else:
-        # linux, unix, etc (I hope)
-        os.system(f'zoom {join_param}')
+    run_url = f'{zoom_exec()} {join_param}'
+
+    print('run:', run_url)
+    os.system(run_url)
 
 def check_zoom_running():
     import psutil
@@ -54,8 +72,7 @@ def main(schedule_file):
     open_zoom(meeting_id, hashed_pass)
 
 if __name__ == '__main__':
-    is_zoom_running = check_zoom_running()
-    if is_zoom_running:
+    if check_zoom_running():
         quit('Another instance of zoom is running. Quitting')
 
     args = parse_args()
