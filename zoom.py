@@ -1,6 +1,6 @@
 import argparse
 import os, time
-import pandas as pd
+import csv
 from datetime import datetime
 
 # https://superuser.com/a/1563359
@@ -54,22 +54,22 @@ def check_zoom_running():
 
 def main(schedule_file):
     # reading the meeting details
-    df = pd.read_csv(schedule_file)
-    df_new = pd.DataFrame()
+    with open(schedule_file) as csv_file:
+        meetings = list(csv.DictReader(
+            csv_file,
+            fieldnames=('time', 'meeting_id', 'pwd'),
+        ))
 
     # Check the current system time
     timestr = datetime.now().strftime('%H:%M')
 
-    # Check if the current time is mentioned in the Dataframe
-    if timestr not in df.Time.values:
+    current = next(a for a in meetings if a['time'] == timestr)
+
+    # Check if the current time is mentioned in schedule
+    if not current:
         return
 
-    df_new = df[df['Time'].astype(str).str.contains(timestr)]
-
-    meeting_id = df_new.iloc[0,1]
-    hashed_pass = df_new.iloc[0,2]
-
-    open_zoom(meeting_id, hashed_pass)
+    open_zoom(current['meeting_id'], current['pwd'])
 
 if __name__ == '__main__':
     if check_zoom_running():
