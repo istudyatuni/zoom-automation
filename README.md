@@ -13,17 +13,23 @@ It performs the following processes:
 ## Prerequisites
 1. Zoom app must be installed in your system.
 2. You must be logged in to your Zoom account.
-3. Meeting time for the day along with Meeting ID and hashed passcode must be entered manually into the "meetingschedule.csv"
+3. Meeting time for the day along with Meeting ID and hashed passcode must be entered manually into the "meetingschedule.csv".
 
 ## How to use?
 1. The best way to use my script is to firstly clone the git repo where you want to.
-2. On Windows expected that Zoom.exe is installed in `APPDATA` folder (default installation), so path will be `%APPDATA%/Zoom/bin/Zoom.exe`
+2. On Windows expected that Zoom.exe is installed in `APPDATA` folder (default installation), so path will be `%APPDATA%/Zoom/bin/Zoom.exe`.
 2. Open "meetingschedule.csv" and fill in the Meeting Time, Meeting ID and Hashed passcode of each meeting you want to join automatically.
 3. Run `python zoom.py` from project folder.
 
-NOTE: Meeting Time must be in Hours and Minutes format only!
+*Note*: Meeting Time must be in `Hours:Minutes` format only!
+
+### CLI arguments
+
+- `--schedule`, `-s` - specify file with schedule. Using this, you can, for example, store schedule for different days in different files.
+- `--cron`, `-c` - do not start infinite loop, just run once. Can be used with scheduling via crontab.
+- `--verbose`, `-v` - show logs.
 
 ## What happens behind the scene?
 1. An infinite loop keeps checking the current time of the system using `datetime.now()` funtion.
 2. The zoom app is opened using `os.system()` funtion as soon as current time matches the time mentioned in "meetingschedule.csv".
-3. Meeting ID and Hashed passcode are passed to zoom application via CLI argument as `--url="zoommtg://zoom.us/join?confno={meeting id}&pwd={hashed passcode}"`
+3. Meeting ID and Hashed passcode are passed to zoom application via CLI argument as `--url="zoommtg://zoom.us/join?confno={meeting id}&pwd={hashed passcode}"`.
