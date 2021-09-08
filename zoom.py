@@ -8,10 +8,10 @@ from datetime import datetime
 join_url = '--url="zoommtg://zoom.us/join?confno={meeting_id}&pwd={pwd}"'
 
 
-silent_log = False
+show_log = False
 
 def simple_log(*args):
-    if not silent_log:
+    if show_log:
         print(*args)
 
 def parse_args():
@@ -19,7 +19,7 @@ def parse_args():
 
     parser.add_argument('-c', '--cron', action='store_true', help='Script is running with crontab. Also can be used for running script once')
     parser.add_argument('-s', '--schedule', type=str, help='File with schedule', default='meetingschedule.csv')
-    parser.add_argument('-q', '--quite', action='store_true', help='Be more quite')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Be more verbose')
 
     return parser.parse_args()
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         quit('Another instance of zoom is running. Quitting')
 
     args = parse_args()
-    silent_log = args.quite
+    show_log = args.verbose
 
     if args.cron:
         main(args.schedule)
