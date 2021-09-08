@@ -56,7 +56,7 @@ def check_zoom_running():
 
 def main(schedule_file):
     # reading the meeting details
-    with open(schedule_file) as csv_file:
+    with open(schedule_file, encoding='utf-8') as csv_file:
         meetings = list(csv.DictReader(
             csv_file,
             # rename columns
@@ -66,7 +66,7 @@ def main(schedule_file):
     # Check the current system time
     timestr = datetime.now().strftime('%H:%M')
 
-    # get first meeting with current time
+    # get first meeting with the current time
     current = next(a for a in meetings if a['time'] == timestr, {})
 
     if not current:
