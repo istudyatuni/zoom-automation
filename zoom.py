@@ -66,14 +66,14 @@ def main(schedule_file):
     # Check the current system time
     timestr = datetime.now().strftime('%H:%M')
 
-    try:
-        # get first meeting with current time
-        current = next(a for a in meetings if a['time'] == timestr)
-    except StopIteration:
-        # current time is not mentioned in schedule
+    # get first meeting with current time
+    current = next(a for a in meetings if a['time'] == timestr, {})
+
+    if not current:
         simple_log('no meeting at', timestr)
         return
 
+    simple_log('meeting at', timestr)
     open_zoom(current['meeting_id'], current['pwd'])
 
 if __name__ == '__main__':
