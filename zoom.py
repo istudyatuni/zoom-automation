@@ -67,7 +67,7 @@ def main(schedule_file):
     timestr = datetime.now().strftime('%H:%M')
 
     # get first meeting with the current time
-    current = next(a for a in meetings if a['time'] == timestr, {})
+    current = next((a for a in meetings if a['time'] == timestr), {})
 
     if not current:
         simple_log('no meeting at', timestr)
